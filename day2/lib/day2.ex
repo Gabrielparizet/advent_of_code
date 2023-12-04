@@ -5,92 +5,111 @@ defmodule Day2 do
 
   # 12 red, 13 green, 14 blue
 
-  def possible? do
+  def possible?() do
     input = File.read!("/Users/gabrielparizet/workspace/advent_of_code/day2/lib/input2.txt")
-    input_list = String.split(input, "\n")
-    make_map(input_list)
+    |> String.split("\n", trim: true)
+    |> Enum.with_index(1)
+    |> make_map()
+
   end
 
-  ### MAKE_MAP()
-
-  defp make_map(input_list) do
-    %{games: Enum.reduce(input_list, %{}, fn x, acc ->
-      Map.put(acc, get_id(x), get_sets(x))
-    end)}
+  defp make_map(list) do
+    Enum.reduce(list, %{}, fn {sets, index}, acc ->
+      Map.put(acc, index, make_sets(sets))
+    end)
   end
 
-  def get_id(line) do
-    line
-    |> String.split([":"])
-    |> List.first()
-    |> String.split("Game ", trim: true)
+  defp make_sets(sets) do
+    [_ | tl] = String.split(sets, ":")
+    tl
     |> List.to_string()
-    |> String.to_integer()
+    |> String.split(";")
+    |> Enum.map(&(make_pick(&1)))
   end
 
-  defp get_sets(line) do
-    line
-    |> String.split([":"])
-    |> get_tail()
-    |> make_sets_map()
+  defp make_pick(set) do
+    set
+    |> String.split(",")
+    |> Enum.map(&(make_color_quantity_pair(&1)))
   end
 
-  defp get_tail([_hd | tl]) do
-    List.to_string(tl)
+  defp make_color_quantity_pair(pick) do
+    pick_list = String.split(pick, " ", trim: true)
+    List.to_tuple(pick_list)
+    |> is_pick_possible?()
   end
 
-  defp make_sets_map(list) do
-    String.split(list, ";")
+  defp is_pick_possible?({quantity, color} = {_, "red"}) do
+    case String.to_integer(quantity) <= 12 do
+      true -> {quantity, color}
+      false -> :error
+    end
   end
 
+  defp is_pick_possible?({quantity, color} = {_, "green"}) do
+    case String.to_integer(quantity) <= 13 do
+      true -> {quantity, color}
+      false -> :error
+    end
+  end
+
+  defp is_pick_possible?({quantity, color} = {_, "blue"}) do
+    case String.to_integer(quantity) <= 14 do
+      true -> {quantity, color}
+      false -> :error
+    end
+  end
+
+end
 
 
-  # defp do_make_games_map([hd | tail]) do
-  #   id = String.split(hd, "Game ") |> List.to_string() |> String.to_integer()
-  #   sets = tail
-  #   %{id: id, sets: sets}
+
+
+
+
+
+
+
+
+
+
+  # defp make_map(input_list) do
+  #   Enum.reduce(input_list, %{}, fn x, acc ->
+  #     [id | sets ] = String.split(x, ":")
+  #     Map.put(acc, get_id(id), sets)
+  #     end)
   # end
 
-  # defp build_id_and_sets([id | sets]) do
-  #   %{}
-  # end
+  # # defp make_game(games) do
+  # #   [id | sets] = String.split(games, ":")
+  # #   %{id: get_id(id), sets: sets}
+  # # end
 
-  # defp make_game(map) do
-  #   map
-  #   |> String.split([":", ";"])
-  #   |> get_game()
-  # end
-
-  # defp get_game([id | sets]) do
-  #   %{id: get_id(id), sets: Enum.map(sets, &(make_sets(&1)))}
-  # end
-
-  # defp get_id(id) do
-  #   id
-  #   |> String.split(["Game", " "], trim: true)
+  # defp get_id(game_id) do
+  #   game_id
+  #   |> String.split("Game ", trim: true)
   #   |> List.to_string()
   #   |> String.to_integer()
   # end
 
   # defp make_sets(sets) do
-  #   String.split(sets, ",")
-  #   |> Enum.map(&make_pick(&1))
+  #   sets
+  #   |> Enum.reduce(%{}, fn x, acc ->
+  #     sets_list = String.split(x, ";")
+  #     Map.put(acc, :set, sets_list)
+  #   end)
+  #   # |> List.to_string()
+  #   # |> String.split(";")
+  #   # |> Enum.map(&(get_set(&1)))
   # end
 
-  # defp make_pick(pick) do
-  #   String.split(pick, " ", trim: true)
-  #   |> get_color_and_number
+  # defp get_set(set) do
+  #   set
+  #   |> String.split(",")
+  #   |> Enum.map(&(get_pick(&1)))
   # end
 
-  # defp get_color_and_number([number | color]) do
-  #   %{number: String.to_integer(number), color: List.to_string(color)}
+  # defp get_pick(pick) do
+  #   [quantity | color] = String.split(pick, " ", trim: true)
+  #   pick_map = %{quantity: quantity, color: color}
   # end
-
-
-
-  # ### DO_POSSIBLE?()
-
-  # defp do_possible?(map) do
-  #   map.sets
-  # end
-end
