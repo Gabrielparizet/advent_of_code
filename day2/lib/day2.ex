@@ -6,11 +6,19 @@ defmodule Day2 do
   # 12 red, 13 green, 14 blue
 
   def possible?() do
-    input = File.read!("/Users/gabrielparizet/workspace/advent_of_code/day2/lib/input2.txt")
+    File.read!("/Users/gabrielparizet/workspace/advent_of_code/day2/lib/input.txt")
     |> String.split("\n", trim: true)
     |> Enum.with_index(1)
     |> make_map()
-
+    |> Enum.map(fn {key, val} -> %{key => create_errors_list(val)} end)
+    |> Enum.map(fn pair ->
+        Enum.drop_while(pair, fn {_key, val} ->
+          val == true
+        end)
+      end)
+    |> List.flatten()
+    |> Enum.map(fn {key, _val} -> key end)
+    |> Enum.reduce(0, fn x, acc -> x + acc end)
   end
 
   defp make_map(list) do
@@ -39,25 +47,32 @@ defmodule Day2 do
     |> is_pick_possible?()
   end
 
-  defp is_pick_possible?({quantity, color} = {_, "red"}) do
+  defp is_pick_possible?({quantity, _color} = {_, "red"}) do
     case String.to_integer(quantity) <= 12 do
-      true -> {quantity, color}
-      false -> :error
+      true -> "possible"
+      false -> "error"
     end
   end
 
-  defp is_pick_possible?({quantity, color} = {_, "green"}) do
+  defp is_pick_possible?({quantity, _color} = {_, "green"}) do
     case String.to_integer(quantity) <= 13 do
-      true -> {quantity, color}
-      false -> :error
+      true -> "possible"
+      false -> "error"
     end
   end
 
-  defp is_pick_possible?({quantity, color} = {_, "blue"}) do
+  defp is_pick_possible?({quantity, _color} = {_, "blue"}) do
     case String.to_integer(quantity) <= 14 do
-      true -> {quantity, color}
-      false -> :error
+      true -> "possible"
+      false -> "error"
     end
+  end
+
+  defp create_errors_list(list) do
+    list
+    |> List.flatten()
+    |> List.to_string()
+    |> String.contains?("error")
   end
 
 end
