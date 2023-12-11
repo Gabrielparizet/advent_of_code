@@ -1,65 +1,65 @@
-defmodule Day3 do
+# defmodule Day3 do
 
-  @numbers ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+#   @numbers ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
-  # @dir {x, y}
-  @top_left {-1, -1}
-  @top {0, -1}
-  @top_right {1, -1}
-  @left {-1, 0}
-  @right {1, 0}
-  @bottom_left {-1, 1}
-  @bottom {0, 1}
-  @bottom_right {1, 1}
-
-
-  @directions [@top_left, @top, @top_right, @left, @right, @bottom_left, @bottom, @bottom_right]
-
-  def navigate() do
-    input = File.read!("/Users/gabrielparizet/workspace/advent_of_code/day_3/lib/input2.txt")
-    |> parse()
-    numbers_map = get_numbers(input)
-    directions = @directions
-    inspect_nbs_map(numbers_map, directions, input)
-  end
+#   # @dir {x, y}
+#   @top_left {-1, -1}
+#   @top {0, -1}
+#   @top_right {1, -1}
+#   @left {-1, 0}
+#   @right {1, 0}
+#   @bottom_left {-1, 1}
+#   @bottom {0, 1}
+#   @bottom_right {1, 1}
 
 
-  def parse(input) do
-    input
-    |> String.split("\n")
-    |> Enum.with_index()
-    |> Enum.map(fn {val, y} ->
-      x_values = String.split(val, "", trim: true)
-      |> Enum.with_index()
-      |> Enum.map(fn {value, x} ->
-        %{{x, y} => value}
-      end)
-    end)
-    |> List.flatten()
-    |> Enum.reduce(%{}, fn map, acc ->
-      Map.merge(acc, map)
-    end)
-  end
+#   @directions [@top_left, @top, @top_right, @left, @right, @bottom_left, @bottom, @bottom_right]
 
-  def get_numbers(input) do
-    numbers_map = Enum.reduce(input, %{}, fn {key, val}, acc ->
-      case String.contains?(val, @numbers) do
-        true -> Map.put_new(acc, key, val)
-        _ -> Map.put_new(acc, :not_a_number, "not_a_number")
-      end
-    end)
-    numbers_map = Map.delete(numbers_map, :not_a_number)
-  end
+#   def navigate() do
+#     input = File.read!("/Users/gabrielparizet/workspace/advent_of_code/day_3/lib/input2.txt")
+#     |> parse()
+#     numbers_map = get_numbers(input)
+#     directions = @directions
+#     inspect_nbs_map(numbers_map, directions, input)
+#   end
 
-  defp inspect_nbs_map(numbers_map, directions, input) do
-    Enum.reduce(numbers_map, %{}, fn {{x, y}, char} ->
-      new_coord = Enum.reduce(@directions fn {x_dir, y_dir} ->
-        {x_dir + x, y_dir + y}
-      end)
-    end)
-  end
 
-end
+#   def parse(input) do
+#     input
+#     |> String.split("\n")
+#     |> Enum.with_index()
+#     |> Enum.map(fn {val, y} ->
+#       x_values = String.split(val, "", trim: true)
+#       |> Enum.with_index()
+#       |> Enum.map(fn {value, x} ->
+#         %{{x, y} => value}
+#       end)
+#     end)
+#     |> List.flatten()
+#     |> Enum.reduce(%{}, fn map, acc ->
+#       Map.merge(acc, map)
+#     end)
+#   end
+
+#   def get_numbers(input) do
+#     numbers_map = Enum.reduce(input, %{}, fn {key, val}, acc ->
+#       case String.contains?(val, @numbers) do
+#         true -> Map.put_new(acc, key, val)
+#         _ -> Map.put_new(acc, :not_a_number, "not_a_number")
+#       end
+#     end)
+#     numbers_map = Map.delete(numbers_map, :not_a_number)
+#   end
+
+#   defp inspect_nbs_map(numbers_map, directions, input) do
+#     Enum.reduce(numbers_map, %{}, fn {{x, y}, char} ->
+#       new_coord = Enum.reduce(@directions fn {x_dir, y_dir} ->
+#         {x_dir + x, y_dir + y}
+#       end)
+#     end)
+#   end
+
+# end
 
 
   # def parse() do
