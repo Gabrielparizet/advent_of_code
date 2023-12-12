@@ -237,6 +237,16 @@ defmodule Day3Test do
       assert Day3.is_digit?(grid, at) == true
     end
 
+    test "join_part_numbers/1 taking a list of digits as input should return the desired part number, being the digits inversed in order and joined as one" do
+      digits = ["4", "6", "7"]
+
+      assert Day3.join_part_numbers(digits) == "764"
+    end
+
+
+    # test "build_part_numbers/"
+
+
 
   end
 

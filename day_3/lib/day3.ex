@@ -13,21 +13,22 @@ defmodule Day3 do
   @directions [@top_left, @top, @top_right, @left, @right, @bottom_left, @bottom, @bottom_right]
 
   def test do
-    File.stream!("/Users/gabrielparizet/workspace/advent_of_code/day_3/lib/input2.txt")
+    File.stream!("/Users/gabrielparizet/workspace/advent_of_code/day_3/lib/input.txt")
     |> Enum.map(fn line -> String.trim(line) end)
     |> Enum.map(&(String.codepoints(&1)))
     |> create_base_grid()
     |> extract_part_numbers()
+    |> calculate_sum()
   end
 
   def create_base_grid(lines) do
     lines
-    |> Enum.with_index()
+    |> Enum.with_index(1)
     |> Enum.reduce(%{}, &create_grid_line/2)
   end
 
   def create_grid_line({chars, y}, grid) do
-    Enum.with_index(chars)
+    Enum.with_index(chars, 1)
       |> Enum.reduce(grid, &(create_grid_column(y, &1, &2)))
   end
 
@@ -55,17 +56,18 @@ defmodule Day3 do
   end
 
   def fetch_part_numbers(yx, grid, part_numbers) do
-    Enum.reduce(@directions, {grid, part_numbers}, fn direction, acc ->
+    Enum.reduce(@directions, {grid, part_numbers}, fn direction, {g, p_nb} ->
       at = move_cursor(yx, direction)
-      case is_digit?(grid, at) do
+      case is_digit?(g, at) do
         true ->
-          {new_grid, integer} = build_part_numbers(at, grid)
-          {new_grid, [integer | acc]}
-        _ -> {grid, acc}
+          {new_grid, integer} = build_part_numbers(at, g)
+          {new_grid, [integer | p_nb]}
+        _ -> {g, p_nb}
       end
     end)
   end
 
+  @spec move_cursor({number(), number()}, {number(), number()}) :: {number(), number()}
   def move_cursor({y, x}, {y_dir, x_dir}) do
     {y + y_dir, x + x_dir}
   end
@@ -75,10 +77,7 @@ defmodule Day3 do
   end
 
   def build_part_numbers(at, grid) do
-    IO.inspect(at, label: "at", limit: 10)
-    IO.inspect(grid, label: "grid", limit: 10)
     do_build_part_numbers(at, grid, [])
-    |> IO.inspect(label: "result", limit: 10)
   end
 
   def do_build_part_numbers(at, grid, digits) do
@@ -101,4 +100,10 @@ defmodule Day3 do
     |> Enum.join()
   end
 
+  def calculate_sum(tuple) do
+    [_grid | part_numbers] = Tuple.to_list(tuple)
+    part_numbers_list = List.flatten(part_numbers)
+    Enum.map(part_numbers_list, fn nb -> String.to_integer(nb) end)
+    |> Enum.reduce(0, fn nb, acc -> nb + acc end)
+  end
 end
