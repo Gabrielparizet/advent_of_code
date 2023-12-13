@@ -4,63 +4,59 @@ defmodule Day4 do
   """
 
   def scratchcards() do
-    input = File.read!("/Users/gabrielparizet/workspace/advent_of_code/day_4/lib/input.txt")
-    |> parse()
-    |> find_match_number()
-    |> IO.inspect(label: "points")
-    |> Enum.map(&(calculate(&1)))
-    |> IO.inspect(label: "numbers_list")
-    |> Enum.reduce(0, fn nb, acc ->
-        nb + acc
-      end)
+    file_name = "/Users/gabrielparizet/workspace/advent_of_code/day_4/lib/input.txt"
+
+    parsed_file =
+      file_name
+      |> parse()
+
+    cards_list =
+      parsed_file
+      |> Enum.map(&create_card/1)
+
+    winning_numbers_by_card =
+      cards_list
+      |> Enum.map(&count_winning_numbers/1)
+
+    score_list = winning_numbers_by_card
+    |> Enum.map(&calculate_score/1)
+
+    Enum.reduce(score_list, 0, fn score, acc -> score + acc end)
   end
 
-  def parse(input) do
-    input
+  defp parse(file) do
+    file
+    |> File.read!()
     |> String.split("\n")
-    |> Enum.map(fn row ->
-      [card_number | numbers] = String.split(row, ":")
-      numbers = List.to_string(numbers)
-      [winning_numbers | numbers_you_have] = String.split(numbers, "|")
-      numbers_you_have = List.to_string((numbers_you_have))
-      %{card_number: get_card_number(card_number), winning_numbers: get_numbers_list(winning_numbers), numbers_you_have: get_numbers_list(numbers_you_have)}
-    end)
   end
 
-  def get_card_number(card_number) do
-    card_number
-    |> String.split(["Card", " "], trim: true)
-    |> List.to_string()
-    |> String.to_integer()
+  defp create_card(card_string) do
+    [_card_number | numbers] = String.split(card_string, [":", "|"], trim: true)
+    [winning_numbers | my_numbers] = numbers
+
+    %{
+      winning_numbers: create_numbers_list(winning_numbers),
+      my_numbers: create_numbers_list(List.to_string(my_numbers))
+    }
   end
 
-  def get_numbers_list(numbers_list) do
-    numbers_list
+  defp create_numbers_list(numbers_string) do
+    numbers_string
     |> String.split(" ", trim: true)
-  end
-
-  def find_match_number(input) do
-    input
-    |> Enum.map(fn map ->
-      Enum.reduce(map.winning_numbers, 0, fn number, acc ->
-        case String.contains?(number, map.numbers_you_have) do
-          true -> acc + 1
-          false -> acc
-        end
-      end)
+    |> Enum.map(fn num ->
+      {number, _remainder_of_binary} = Integer.parse(num)
+      number
     end)
-    |> Enum.filter(fn nb -> nb != 0 end)
   end
 
-  def calculate(input) when input > 0 do
-    calculate_recursive(1, input-1)
+  defp count_winning_numbers(%{winning_numbers: winning_numbers, my_numbers: my_numbers}) do
+    Enum.count(winning_numbers, &Enum.member?(my_numbers, &1))
   end
 
-  def calculate_recursive(result, 0), do: result
-
-  def calculate_recursive(result, input) do
-    new_input = input - 1
-    new_result = result * 2
-    calculate_recursive(new_result, new_input)
+  defp calculate_score(0), do: 0
+  defp calculate_score(1), do: 1
+  defp calculate_score(2), do: 2
+  defp calculate_score(number) when number > 2 do
+    Enum.reduce(1..(number - 1), 1, fn(_, acc) -> acc * 2 end)
   end
 end
