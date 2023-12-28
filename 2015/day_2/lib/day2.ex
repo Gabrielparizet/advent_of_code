@@ -1,13 +1,16 @@
 defmodule Day2 do
 
+  ############### PART 1 ################
   def count_wrapping_paper_dimensions do
     input = File.read!("/Users/gabrielparizet/workspace/advent_of_code/2015/day_2/lib/input.txt")
 
     gifts_list = parse_input(input)
+    |> IO.inspect(label: "gifts list")
 
     gifts_dimensions_list = Enum.map(gifts_list, &calculate_gift_dimensions/1)
 
     Enum.reduce(gifts_dimensions_list, fn number, acc -> number + acc end)
+
   end
 
   def parse_input(input) do
@@ -44,5 +47,28 @@ defmodule Day2 do
     |> Enum.sort(:asc)
     |> List.first()
     |> div(2)
+  end
+
+  ############### PART 2 ################
+  def count_ribbon_needed do
+    input = File.read!("/Users/gabrielparizet/workspace/advent_of_code/2015/day_2/lib/input.txt")
+
+    gifts_list = parse_input(input)
+
+    ribbon_for_wrapping_list = Enum.map(gifts_list, &count_ribbon/1)
+
+    Enum.reduce(ribbon_for_wrapping_list, 0, fn num, acc -> num + acc end)
+  end
+
+  def count_ribbon(%{length: length, width: width, height: height}) do
+    dimension_list_sorted = Enum.sort([length, width, height], :asc)
+    [smallest | rest] = dimension_list_sorted
+    [middle | greatest] = rest
+    IO.inspect(smallest, label: "smallest")
+    IO.inspect(middle, label: "middle")
+    IO.inspect(greatest, label: "greatest")
+    wrapping = (smallest * 2) + (middle * 2)
+    bow = length * width * height
+    wrapping + bow
   end
 end
